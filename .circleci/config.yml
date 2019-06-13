@@ -15,4 +15,5 @@ workflows:
       - welcome/run:
           filters:
             tags:
-              only: /^.+$/
+              only: /^v.*/
+
