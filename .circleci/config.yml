@@ -2,9 +2,20 @@
 version: 2.1
 
 # Use a package of configuration called an orb, see https://circleci.com/docs/2.0/orb-intro/
-orbs:
-  # Declare a dependency on the welcome-orb
-  welcome: circleci/welcome-orb@0.3.1
+jobs:
+  welcome/run:
+    docker:
+    - image: circleci/welcome-config-image:0.1.40-b28e6fe
+    steps:
+    - run:
+        command: welcome_message.sh
+        name: Welcome and basics to get you started
+    - run:
+        command: common_env_vars.sh
+        name: Built-in environment variables for your project
+    - run:
+        command: next_steps.sh
+        name: Next steps to customize your pipeline
 
 # Orchestrate or schedule a set of jobs, see https://circleci.com/docs/2.0/workflows/
 workflows:
@@ -13,7 +24,7 @@ workflows:
     # Run the welcome/run job in its own container
     jobs:
       - welcome/run:
-        filters:
-          tags:
-            only: /^v.*/
+          filters:
+            tags:
+              only: /.*/
 
