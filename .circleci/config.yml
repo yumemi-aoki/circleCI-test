@@ -2,29 +2,50 @@
 version: 2.1
 
 # Use a package of configuration called an orb, see https://circleci.com/docs/2.0/orb-intro/
+version: 2
 jobs:
-  welcome/run:
-    docker:
-    - image: circleci/welcome-config-image:0.1.40-b28e6fe
+  build:
+    machine: true
     steps:
-    - run:
-        command: welcome_message.sh
-        name: Welcome and basics to get you started
-    - run:
-        command: common_env_vars.sh
-        name: Built-in environment variables for your project
-    - run:
-        command: next_steps.sh
-        name: Next steps to customize your pipeline
+      - run: echo build job
+  test:
+    machine: true
+    steps:
+      - run: echo test job
+  deploy:
+    machine: true
+    steps:
+      - run: echo deploy
+      - run:
+          name: Whether exists tag
+          command: |
+            if [ "${CIRCLE_TAG-undefined}" != "undefined" ]; then
+                echo exist ^v.* tag
+            else
+                echo no tag
+            fi
 
 # Orchestrate or schedule a set of jobs, see https://circleci.com/docs/2.0/workflows/
 workflows:
-  # Name the workflow "Welcome"
-  Welcome:
-    # Run the welcome/run job in its own container
+  build-test-and-deploy:
     jobs:
-      - welcome/run:
+      # build and test jobs is all branch
+      - build:
           filters:
             tags:
               only: /.*/
+      - test:
+          requires:
+            - build
+          filters:
+            tags:
+              only: /.*/
+      - deploy:
+          requires:
+            - test
+          filters:
+            branches:
+              only: master
+            tags:
+              only: /^v.*/
 
